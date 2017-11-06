@@ -9,27 +9,27 @@ import (
 func testCaseOne(t *testing.T, osArgs []string, expectArr []string) {
 	resultArr := []string{}
 
-	optHandler := func(option *GetoptOption, nametype GetoptNameType, value string) error {
+	optHandler := func(option *Option, nametype NameType, value string) error {
 		switch nametype {
-		case GetoptShortName:
+		case ShortName:
 			resultArr = append(resultArr, fmt.Sprintf("-%c", option.ShortName))
-		case GetoptLongName:
+		case LongName:
 			resultArr = append(resultArr, fmt.Sprintf("--%s", option.LongName))
 		}
-		if option.HasArg != GetoptNoArgument {
+		if option.HasArg != NoArgument {
 			resultArr = append(resultArr, fmt.Sprintf("{%s}", value))
 		}
 		return nil
 	}
 
 	getopt := &Getopt{
-		Options: []GetoptOption{
-			{'x', GetoptNoLongName, GetoptNoArgument, optHandler},
-			{GetoptNoShortName, "xyz", GetoptNoArgument, optHandler},
-			{'h', "help", GetoptNoArgument, optHandler},
-			{'V', "version", GetoptNoArgument, optHandler},
-			{'a', "caa", GetoptNoArgument, optHandler},
-			{'b', "cba", GetoptRequiredArgument, optHandler},
+		Options: []Option{
+			{'x', NoLongName, NoArgument, optHandler},
+			{NoShortName, "xyz", NoArgument, optHandler},
+			{'h', "help", NoArgument, optHandler},
+			{'V', "version", NoArgument, optHandler},
+			{'a', "caa", NoArgument, optHandler},
+			{'b', "cba", RequiredArgument, optHandler},
 		},
 	}
 
@@ -51,14 +51,14 @@ func testCaseOne(t *testing.T, osArgs []string, expectArr []string) {
 func testCaseAbbrev(t *testing.T, osArgs []string, expectArr []string) {
 	resultArr := []string{}
 
-	optHandler := func(option *GetoptOption, nametype GetoptNameType, value string) error {
+	optHandler := func(option *Option, nametype NameType, value string) error {
 		switch nametype {
-		case GetoptShortName:
+		case ShortName:
 			resultArr = append(resultArr, fmt.Sprintf("-%c", option.ShortName))
-		case GetoptLongName:
+		case LongName:
 			resultArr = append(resultArr, fmt.Sprintf("--%s", option.LongName))
 		}
-		if option.HasArg != GetoptNoArgument {
+		if option.HasArg != NoArgument {
 			resultArr = append(resultArr, fmt.Sprintf("{%s}", value))
 		}
 		return nil
@@ -66,11 +66,11 @@ func testCaseAbbrev(t *testing.T, osArgs []string, expectArr []string) {
 
 	getopt := &Getopt{
 		AllowAbbrev: true,
-		Options: []GetoptOption{
-			{'h', "help", GetoptNoArgument, optHandler},
-			{'V', "version", GetoptNoArgument, optHandler},
-			{'a', "daa", GetoptNoArgument, optHandler},
-			{'b', "cba", GetoptRequiredArgument, optHandler},
+		Options: []Option{
+			{'h', "help", NoArgument, optHandler},
+			{'V', "version", NoArgument, optHandler},
+			{'a', "daa", NoArgument, optHandler},
+			{'b', "cba", RequiredArgument, optHandler},
 		},
 	}
 
@@ -92,14 +92,14 @@ func testCaseAbbrev(t *testing.T, osArgs []string, expectArr []string) {
 func testCaseAlternative(t *testing.T, osArgs []string, expectArr []string) {
 	resultArr := []string{}
 
-	optHandler := func(option *GetoptOption, nametype GetoptNameType, value string) error {
+	optHandler := func(option *Option, nametype NameType, value string) error {
 		switch nametype {
-		case GetoptShortName:
+		case ShortName:
 			resultArr = append(resultArr, fmt.Sprintf("-%c", option.ShortName))
-		case GetoptLongName:
+		case LongName:
 			resultArr = append(resultArr, fmt.Sprintf("--%s", option.LongName))
 		}
-		if option.HasArg != GetoptNoArgument {
+		if option.HasArg != NoArgument {
 			resultArr = append(resultArr, fmt.Sprintf("{%s}", value))
 		}
 		return nil
@@ -107,11 +107,11 @@ func testCaseAlternative(t *testing.T, osArgs []string, expectArr []string) {
 
 	getopt := &Getopt{
 		AllowAlternative: true,
-		Options: []GetoptOption{
-			{'h', "help", GetoptNoArgument, optHandler},
-			{'V', "version", GetoptNoArgument, optHandler},
-			{'a', "daa", GetoptNoArgument, optHandler},
-			{'b', "cba", GetoptRequiredArgument, optHandler},
+		Options: []Option{
+			{'h', "help", NoArgument, optHandler},
+			{'V', "version", NoArgument, optHandler},
+			{'a', "daa", NoArgument, optHandler},
+			{'b', "cba", RequiredArgument, optHandler},
 		},
 	}
 
@@ -133,14 +133,14 @@ func testCaseAlternative(t *testing.T, osArgs []string, expectArr []string) {
 func testCaseOptional(t *testing.T, osArgs []string, expectArr []string) {
 	resultArr := []string{}
 
-	optHandler := func(option *GetoptOption, nametype GetoptNameType, value string) error {
+	optHandler := func(option *Option, nametype NameType, value string) error {
 		switch nametype {
-		case GetoptShortName:
+		case ShortName:
 			resultArr = append(resultArr, fmt.Sprintf("-%c", option.ShortName))
-		case GetoptLongName:
+		case LongName:
 			resultArr = append(resultArr, fmt.Sprintf("--%s", option.LongName))
 		}
-		if option.HasArg != GetoptNoArgument {
+		if option.HasArg != NoArgument {
 			resultArr = append(resultArr, fmt.Sprintf("{%s}", value))
 		}
 		return nil
@@ -148,11 +148,11 @@ func testCaseOptional(t *testing.T, osArgs []string, expectArr []string) {
 
 	getopt := &Getopt{
 		AllowAbbrev: true,
-		Options: []GetoptOption{
-			{'h', "help", GetoptNoArgument, optHandler},
-			{'V', "version", GetoptNoArgument, optHandler},
-			{'a', "daa", GetoptNoArgument, optHandler},
-			{'b', "cba", GetoptOptionalArgument, optHandler},
+		Options: []Option{
+			{'h', "help", NoArgument, optHandler},
+			{'V', "version", NoArgument, optHandler},
+			{'a', "daa", NoArgument, optHandler},
+			{'b', "cba", OptionalArgument, optHandler},
 		},
 	}
 
@@ -171,7 +171,7 @@ func testCaseOptional(t *testing.T, osArgs []string, expectArr []string) {
 	}
 }
 
-func TestGetoptShortOption(t *testing.T) {
+func TestShortOption(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "-h", "-V"},
@@ -179,7 +179,7 @@ func TestGetoptShortOption(t *testing.T) {
 	)
 }
 
-func TestGetoptShortOptionWithInlineArgument(t *testing.T) {
+func TestShortOptionWithInlineArgument(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "-abcd"},
@@ -187,7 +187,7 @@ func TestGetoptShortOptionWithInlineArgument(t *testing.T) {
 	)
 }
 
-func TestGetoptShortOptionWithStandaloneArgument(t *testing.T) {
+func TestShortOptionWithStandaloneArgument(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "-ab", "cd"},
@@ -195,7 +195,7 @@ func TestGetoptShortOptionWithStandaloneArgument(t *testing.T) {
 	)
 }
 
-func TestGetoptShortOptionWithEqualArgument(t *testing.T) {
+func TestShortOptionWithEqualArgument(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "-ab=cd"},
@@ -203,7 +203,7 @@ func TestGetoptShortOptionWithEqualArgument(t *testing.T) {
 	)
 }
 
-func TestGetoptShortOptionWithEqualEmptyArgument(t *testing.T) {
+func TestShortOptionWithEqualEmptyArgument(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "-ab="},
@@ -211,7 +211,7 @@ func TestGetoptShortOptionWithEqualEmptyArgument(t *testing.T) {
 	)
 }
 
-func TestGetoptShortOptionWithArgumentTwo(t *testing.T) {
+func TestShortOptionWithArgumentTwo(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "-a", "-b", "-c"},
@@ -219,7 +219,7 @@ func TestGetoptShortOptionWithArgumentTwo(t *testing.T) {
 	)
 }
 
-func TestGetoptParameterBetweenShortOptions(t *testing.T) {
+func TestParameterBetweenShortOptions(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "-a", "XXX", "-bcd", "ZZZ"},
@@ -227,7 +227,7 @@ func TestGetoptParameterBetweenShortOptions(t *testing.T) {
 	)
 }
 
-func TestGetoptAllParameters(t *testing.T) {
+func TestAllParameters(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "--", "-a", "XXX", "-bcd"},
@@ -235,7 +235,7 @@ func TestGetoptAllParameters(t *testing.T) {
 	)
 }
 
-func TestGetoptHalfParameters(t *testing.T) {
+func TestHalfParameters(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "-a", "-h", "--", "XXX", "-bcd"},
@@ -243,7 +243,7 @@ func TestGetoptHalfParameters(t *testing.T) {
 	)
 }
 
-func TestGetoptLongOptionsWithArgument(t *testing.T) {
+func TestLongOptionsWithArgument(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "--caa", "--cba", "XXX"},
@@ -251,7 +251,7 @@ func TestGetoptLongOptionsWithArgument(t *testing.T) {
 	)
 }
 
-func TestGetoptLongOptionsWithEqualArgument(t *testing.T) {
+func TestLongOptionsWithEqualArgument(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "--caa", "--cba=XXX"},
@@ -259,7 +259,7 @@ func TestGetoptLongOptionsWithEqualArgument(t *testing.T) {
 	)
 }
 
-func TestGetoptLongOptionsWithEqualEmpty(t *testing.T) {
+func TestLongOptionsWithEqualEmpty(t *testing.T) {
 	testCaseOne(
 		t,
 		[]string{"PROG", "--caa", "--cba="},
@@ -267,7 +267,7 @@ func TestGetoptLongOptionsWithEqualEmpty(t *testing.T) {
 	)
 }
 
-func TestGetoptAbbrevLongOptions(t *testing.T) {
+func TestAbbrevLongOptions(t *testing.T) {
 	testCaseAbbrev(
 		t,
 		[]string{"PROG", "--d", "--c=XXX"},
@@ -275,7 +275,7 @@ func TestGetoptAbbrevLongOptions(t *testing.T) {
 	)
 }
 
-func TestGetoptAbbrevLongOptionsWithEqualArgument(t *testing.T) {
+func TestAbbrevLongOptionsWithEqualArgument(t *testing.T) {
 	testCaseAbbrev(
 		t,
 		[]string{"PROG", "--daa", "--cb=XXX"},
@@ -283,7 +283,7 @@ func TestGetoptAbbrevLongOptionsWithEqualArgument(t *testing.T) {
 	)
 }
 
-func TestGetoptAlternativeLongOptionsWithArgument(t *testing.T) {
+func TestAlternativeLongOptionsWithArgument(t *testing.T) {
 	testCaseAlternative(
 		t,
 		[]string{"PROG", "--daa", "-cba", "XXX"},
@@ -291,7 +291,7 @@ func TestGetoptAlternativeLongOptionsWithArgument(t *testing.T) {
 	)
 }
 
-func TestGetoptAlternativeLongOptionsWithEqualArgument(t *testing.T) {
+func TestAlternativeLongOptionsWithEqualArgument(t *testing.T) {
 	testCaseAlternative(
 		t,
 		[]string{"PROG", "-cba=XXX"},
@@ -299,7 +299,7 @@ func TestGetoptAlternativeLongOptionsWithEqualArgument(t *testing.T) {
 	)
 }
 
-func TestGetoptOptionalLongOption(t *testing.T) {
+func TestOptionalLongOption(t *testing.T) {
 	testCaseOptional(
 		t,
 		[]string{"PROG", "--cba"},
@@ -307,7 +307,7 @@ func TestGetoptOptionalLongOption(t *testing.T) {
 	)
 }
 
-func TestGetoptOptionalShortOption(t *testing.T) {
+func TestOptionalShortOption(t *testing.T) {
 	testCaseOptional(
 		t,
 		[]string{"PROG", "-b"},
@@ -315,7 +315,7 @@ func TestGetoptOptionalShortOption(t *testing.T) {
 	)
 }
 
-func TestGetoptOptionalShortOptionTwo(t *testing.T) {
+func TestOptionalShortOptionTwo(t *testing.T) {
 	testCaseOptional(
 		t,
 		[]string{"PROG", "-b", "-v"},

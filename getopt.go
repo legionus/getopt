@@ -26,44 +26,44 @@ import (
 )
 
 const (
-	GetoptNoShortName = '0'
-	GetoptNoLongName  = ""
+	NoShortName = '0'
+	NoLongName  = ""
 )
 
-// GetoptArgumentType
-type GetoptArgumentType int
+// ArgumentType
+type ArgumentType int
 
 const (
-	// GetoptNoArgument means the option does not take an argument.
-	GetoptNoArgument GetoptArgumentType = iota
-	// GetoptRequiredArgument means the option requires an argument.
-	GetoptRequiredArgument
-	// GetoptOptionalArgument means the option takes an optional argument.
-	GetoptOptionalArgument
+	// NoArgument means the option does not take an argument.
+	NoArgument ArgumentType = iota
+	// RequiredArgument means the option requires an argument.
+	RequiredArgument
+	// OptionalArgument means the option takes an optional argument.
+	OptionalArgument
 )
 
-type GetoptNameType int
+type NameType int
 
 const (
-	_ GetoptNameType = iota
-	GetoptShortName
-	GetoptLongName
+	_ NameType = iota
+	ShortName
+	LongName
 )
 
-// GetoptOption describes command-line option, his short and long form.
-type GetoptOption struct {
-	// ShortName specifies short form of the option. If there is no such form, it should be GetoptNoShortName.
+// Option describes command-line option, his short and long form.
+type Option struct {
+	// ShortName specifies short form of the option. If there is no such form, it should be NoShortName.
 	ShortName byte
-	// LongName specifies long form of the option. If there is no such form, it should be GetoptNoLongName.
+	// LongName specifies long form of the option. If there is no such form, it should be NoLongName.
 	LongName string
-	// HasArg describes the need to have the argument. Option may not require additional arguments (GetoptNoArgument),
-	// Option may require an additional argument (GetoptRequiredArgument) or the argument may be optional (GetoptOptionalArgument).
-	HasArg GetoptArgumentType
+	// HasArg describes the need to have the argument. Option may not require additional arguments (NoArgument),
+	// Option may require an additional argument (RequiredArgument) or the argument may be optional (OptionalArgument).
+	HasArg ArgumentType
 	// Handler specifies the handler that will be called if the option is specified on the command line.
-	Handler GetoptOptionFunc
+	Handler OptionFunc
 }
 
-type GetoptOptionFunc func(*GetoptOption, GetoptNameType, string) error
+type OptionFunc func(*Option, NameType, string) error
 
 type Getopt struct {
 	// AllowAlternative allows long options to start with a single `-'. See (getopt -a).
@@ -71,13 +71,13 @@ type Getopt struct {
 	// AllowAbbrev allows long options be abbreviated, as long as the abbreviation is not ambiguous.
 	AllowAbbrev bool
 	// Options describes short and long options.
-	Options []GetoptOption
+	Options []Option
 	args    []string
 }
 
-func (g Getopt) getShortOption(c byte, options []GetoptOption) (*GetoptOption, error) {
+func (g Getopt) getShortOption(c byte, options []Option) (*Option, error) {
 	for _, option := range options {
-		if option.ShortName == GetoptNoShortName {
+		if option.ShortName == NoShortName {
 			continue
 		}
 		if c == option.ShortName {
@@ -90,11 +90,11 @@ func (g Getopt) getShortOption(c byte, options []GetoptOption) (*GetoptOption, e
 	return nil, fmt.Errorf("invalid option -- '%c'", c)
 }
 
-func (g Getopt) getLongOption(name string, options []GetoptOption) (*GetoptOption, error) {
-	var ret *GetoptOption
+func (g Getopt) getLongOption(name string, options []Option) (*Option, error) {
+	var ret *Option
 	for i := range options {
 		option := options[i]
-		if option.LongName == GetoptNoLongName {
+		if option.LongName == NoLongName {
 			continue
 		}
 		if g.AllowAbbrev {
@@ -136,12 +136,12 @@ func (g *Getopt) Parse(args []string) error {
 			break
 		}
 
-		var argType GetoptNameType
+		var argType NameType
 		if len(args[optind]) > 1 {
 			if args[optind][0] == '-' {
-				argType = GetoptShortName
+				argType = ShortName
 				if args[optind][1] == '-' {
-					argType = GetoptLongName
+					argType = LongName
 				}
 			}
 		}
@@ -150,9 +150,9 @@ func (g *Getopt) Parse(args []string) error {
 			v  string
 			eq int
 		)
-		if argType == GetoptShortName {
+		if argType == ShortName {
 			var (
-				option *GetoptOption
+				option *Option
 				err    error
 				i      int
 				n      rune
@@ -163,18 +163,18 @@ func (g *Getopt) Parse(args []string) error {
 				if err != nil {
 					return err
 				} else if option == nil {
-					argType = GetoptLongName
+					argType = LongName
 					args[optind] = "-" + args[optind]
 					if eq > 0 {
 						args[optind] += "=" + v
 					}
 					goto longArg
 				}
-				if option.HasArg != GetoptNoArgument {
+				if option.HasArg != NoArgument {
 					i++
 					break
 				}
-				if err := option.Handler(option, GetoptShortName, ""); err != nil {
+				if err := option.Handler(option, ShortName, ""); err != nil {
 					return err
 				}
 				option = nil
@@ -184,38 +184,38 @@ func (g *Getopt) Parse(args []string) error {
 				continue
 			}
 
-			if option.HasArg != GetoptNoArgument {
+			if option.HasArg != NoArgument {
 				if eq > 0 {
-					if err := option.Handler(option, GetoptShortName, v); err != nil {
+					if err := option.Handler(option, ShortName, v); err != nil {
 						return err
 					}
 					continue
 				}
 				if i < len(args[optind][1:]) {
-					if err := option.Handler(option, GetoptShortName, args[optind][i+1:]); err != nil {
+					if err := option.Handler(option, ShortName, args[optind][i+1:]); err != nil {
 						return err
 					}
 					continue
 				}
 				if optind+1 < len(args) {
 					optind++
-					if err := option.Handler(option, GetoptShortName, args[optind]); err != nil {
+					if err := option.Handler(option, ShortName, args[optind]); err != nil {
 						return err
 					}
 					continue
 				}
 			}
 
-			if option.HasArg == GetoptRequiredArgument {
+			if option.HasArg == RequiredArgument {
 				return fmt.Errorf("option requires an argument -- '%c'", option.ShortName)
 			}
-			if err := option.Handler(option, GetoptShortName, ""); err != nil {
+			if err := option.Handler(option, ShortName, ""); err != nil {
 				return err
 			}
 			continue
 		}
 	longArg:
-		if argType == GetoptLongName {
+		if argType == LongName {
 			eq, args[optind], v = g.splitArg(args[optind])
 
 			option, err := g.getLongOption(args[optind][2:], g.Options)
@@ -223,26 +223,26 @@ func (g *Getopt) Parse(args []string) error {
 				return err
 			}
 
-			if option.HasArg != GetoptNoArgument {
+			if option.HasArg != NoArgument {
 				if eq > 0 {
-					if err := option.Handler(option, GetoptLongName, v); err != nil {
+					if err := option.Handler(option, LongName, v); err != nil {
 						return err
 					}
 					continue
 				}
 				if optind+1 < len(args) {
 					optind++
-					if err := option.Handler(option, GetoptLongName, args[optind]); err != nil {
+					if err := option.Handler(option, LongName, args[optind]); err != nil {
 						return err
 					}
 					continue
 				}
 			}
 
-			if option.HasArg == GetoptRequiredArgument {
+			if option.HasArg == RequiredArgument {
 				return fmt.Errorf("option '--%s' requires an argument", option.LongName)
 			}
-			if err := option.Handler(option, GetoptLongName, ""); err != nil {
+			if err := option.Handler(option, LongName, ""); err != nil {
 				return err
 			}
 			continue
