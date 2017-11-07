@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	NoShortName = '0'
+	NoShortName = 0x0
 	NoLongName  = ""
 )
 
