@@ -66,6 +66,8 @@ type Option struct {
 type OptionFunc func(*Option, NameType, string) error
 
 type Getopt struct {
+	// AllowUnknow allow ignore unknown options.
+	AllowUnknow bool
 	// AllowAlternative allows long options to start with a single `-'. See (getopt -a).
 	AllowAlternative bool
 	// AllowAbbrev allows long options be abbreviated, as long as the abbreviation is not ambiguous.
@@ -74,6 +76,10 @@ type Getopt struct {
 	Options []Option
 	args    []string
 }
+
+var (
+	errUnknownOption = fmt.Errorf("unrecognized option")
+)
 
 func (g Getopt) getShortOption(c byte, options []Option) (*Option, error) {
 	for _, option := range options {
@@ -87,7 +93,7 @@ func (g Getopt) getShortOption(c byte, options []Option) (*Option, error) {
 	if g.AllowAlternative {
 		return nil, nil
 	}
-	return nil, fmt.Errorf("invalid option -- '%c'", c)
+	return nil, errUnknownOption
 }
 
 func (g Getopt) getLongOption(name string, options []Option) (*Option, error) {
@@ -114,7 +120,7 @@ func (g Getopt) getLongOption(name string, options []Option) (*Option, error) {
 	if ret != nil {
 		return ret, nil
 	}
-	return nil, fmt.Errorf("unrecognized option -- '%s'", name)
+	return nil, errUnknownOption
 }
 
 func (g Getopt) splitArg(s string) (int, string, string) {
@@ -160,6 +166,13 @@ func (g *Getopt) Parse(args []string) error {
 			eq, args[optind], v = g.splitArg(args[optind])
 			for i, n = range args[optind][1:] {
 				option, err = g.getShortOption(byte(n), g.Options)
+				if err == errUnknownOption {
+					if !g.AllowUnknow {
+						return fmt.Errorf("invalid option -- '%c'", byte(n))
+					}
+					g.args = append(g.args, "-" + string(n))
+					continue
+				}
 				if err != nil {
 					return err
 				} else if option == nil {
@@ -219,6 +232,13 @@ func (g *Getopt) Parse(args []string) error {
 			eq, args[optind], v = g.splitArg(args[optind])
 
 			option, err := g.getLongOption(args[optind][2:], g.Options)
+			if err == errUnknownOption {
+				if !g.AllowUnknow {
+					return fmt.Errorf("unrecognized option -- '%s'", args[optind][2:])
+				}
+				g.args = append(g.args, args[optind])
+				continue
+			}
 			if err != nil {
 				return err
 			}
